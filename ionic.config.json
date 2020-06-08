@@ -1,0 +1,7 @@
+{
+  "name": "ionic-flashcard",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
