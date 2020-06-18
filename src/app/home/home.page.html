@@ -1,20 +1,61 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-segment [(ngModel)]="study">
+      <ion-segment-button (click)="selectStudy('due')" value="due">
+        <ion-label>Due   <ion-badge slot="end" color="tertiary">{{ amountOfDueCards }}</ion-badge></ion-label>
+      </ion-segment-button>
+      <ion-segment-button (click)="selectStudy('random')" value="random">
+        <ion-label>Random</ion-label>
+      </ion-segment-button>
+      <ion-segment-button (click)="selectStudy('custom')" value="custom">
+        <ion-label>Custom</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+<ion-content>
+  <ion-item lines="none" class="ion-padding">
+  <nz-card class="card" *ngIf="cardToDisplay">
+      <h1> {{ cardToDisplay.question }} </h1>
+      <p class="ion-margin"  *ngIf="answer"> {{ cardToDisplay.answer }}</p>
+      <div class="ion-padding">
+        <p>
+          <ion-chip outline color="primary"  *ngFor="let tag of cardToDisplay.tags">
+            <ion-label>{{tag}}</ion-label>
+          </ion-chip>
+        </p>
+      </div>
+      <button nz-button nzType="default" *ngIf="!answer" (click)="toggleAnswer()">Toggle answer</button>
+      <button nz-button nzType="default" *ngIf="answer" (click)="nextCard()">Next</button>
+    </nz-card>
+  </ion-item>
 </ion-content>
+
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="home" [routerLink]="['home']">
+      <ion-icon name="home" size="small"></ion-icon>
+    </ion-tab-button>
+
+    <ion-tab-button tab="add">
+      <ion-icon name="add" color="success"></ion-icon>
+    </ion-tab-button>
+
+    <ion-tab-button tab="" (click)="showUserPopover()">
+      <ion-icon name="person" size="small"></ion-icon>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+
+<style>
+.container {
+  background-color: grey;
+}
+.card {
+  text-align: center;
+  margin: 0 auto;
+  width: 300px;
+  border-radius: 10px;
+}
+</style>
