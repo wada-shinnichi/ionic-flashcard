@@ -25,6 +25,8 @@ export class HomePage implements OnInit {
   today;
   answer;
 
+  modalComplete;
+
   constructor(
     public popoverController: PopoverController,
     private cardService: CardService,
@@ -39,9 +41,11 @@ export class HomePage implements OnInit {
       // Finner antall due cards for å vise som badge
       this.today = this.dateService.transformDate(new Date());
       this.getNoOfDueCards();
+      // Antall valgte tags for custom-study
       this.selectedTags = [];
       this.study = 'due';
       this.selectStudy(this.study);
+      this.modalComplete = false;
     });
   }
 
@@ -63,21 +67,21 @@ export class HomePage implements OnInit {
       }
       case 'custom': {
         this.index = 0;
-
         await this.presentModal();
         this.cardsToDisplay = '';
 
         console.log(this.selectedTags);
 
-        if (this.selectedTags && this.selectedTags.length > 0) {
+        if (this.selectedTags) {
           this.study = study;
           this.cardsToDisplay = this.allCards
             .filter(card => (card.tags.some((val) => this.selectedTags.indexOf(val) !== -1)));
           this.cardToDisplay = this.cardsToDisplay[this.index];
         } else {
-          this.selectStudy('due');
           this.router.navigate(['/']);
+          this.selectStudy('due');
         }
+
         break;
       }
       default: {
@@ -109,6 +113,8 @@ export class HomePage implements OnInit {
     modal.onDidDismiss().then((data) => {
       if (data !== null) {
         this.selectedTags = data.data;
+      } else {
+        this.selectedTags = [];
       }
     });
 

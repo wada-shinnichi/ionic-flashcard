@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { CardService } from 'src/app/services/card.service';
+import * as _ from 'lodash';
 
 @Component({
   template: `
