@@ -6,6 +6,7 @@ import { DateService } from '../services/date.service';
 import * as _ from 'lodash';
 import { PopoverComponent } from './popover/popover.component';
 import { ModalComponent } from './modal/modal.component';
+import { ICard } from '../shared/card';
 
 @Component({
   selector: 'app-home',
@@ -25,8 +26,7 @@ export class HomePage implements OnInit {
   today;
   answer;
 
-  modalComplete;
-
+  modal;
   constructor(
     public popoverController: PopoverController,
     private cardService: CardService,
@@ -45,13 +45,12 @@ export class HomePage implements OnInit {
       this.selectedTags = [];
       this.study = 'due';
       this.selectStudy(this.study);
-      this.modalComplete = false;
     });
   }
 
   getNoOfDueCards() {
     if (this.allCards.length >= 1) {
-      this.dueCards = this.allCards.filter(card => card.date <= this.today);
+      this.dueCards = this.allCards.filter((card: ICard) => card.date <= this.today);
       this.amountOfDueCards = this.dueCards.length;
     }
   }
@@ -66,22 +65,29 @@ export class HomePage implements OnInit {
         break;
       }
       case 'custom': {
-        this.index = 0;
         await this.presentModal();
+
+        this.index = 0;
         this.cardsToDisplay = '';
+        await this.modal.onDidDismiss().then((data) => {
+          if (data !== null) {
+            this.study = study;
+            this.selectedTags = [];
 
-        console.log(this.selectedTags);
+            data.data.label.array.forEach(element => {
+              this.selectedTags.push(element);
+            });
 
-        if (this.selectedTags) {
-          this.study = study;
-          this.cardsToDisplay = this.allCards
-            .filter(card => (card.tags.some((val) => this.selectedTags.indexOf(val) !== -1)));
-          this.cardToDisplay = this.cardsToDisplay[this.index];
-        } else {
-          this.router.navigate(['/']);
-          this.selectStudy('due');
-        }
-
+            console.log(this.selectedTags);
+            this.cardsToDisplay = this.allCards
+              .filter(card => (card.tags.some((val) => this.selectedTags.indexOf(val) !== -1)));
+            this.cardToDisplay = this.cardsToDisplay[this.index];
+          } else {
+            this.selectedTags = [];
+            this.router.navigate(['/']);
+            this.selectStudy('due');
+          }
+        });
         break;
       }
       default: {
@@ -105,23 +111,13 @@ export class HomePage implements OnInit {
   }
 
   async presentModal() {
-    const modal = await this.modalController.create({
+    this.modal = await this.modalController.create({
       component: ModalComponent,
       cssClass: 'my-custom-class'
     });
 
-    modal.onDidDismiss().then((data) => {
-      if (data !== null) {
-        this.selectedTags = data.data;
-      } else {
-        this.selectedTags = [];
-      }
-    });
-
-    return await modal.present();
+    return await this.modal.present();
   }
-
-
 
   async showUserPopover(ev: any) {
     const popover = await this.popoverController.create({
